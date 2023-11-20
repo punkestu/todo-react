@@ -1,3 +1,5 @@
+import { invoke } from "@tauri-apps/api";
+
 function tickTodo(todos, id) {
   return todos.map((todo) => {
     if (todo.id === id) {
@@ -14,9 +16,15 @@ function RecentTodo({ todo, todos, setTodos }) {
       onClick={() => {
         setTodos(tickTodo(todos, todo.id));
         if (todo.state) {
-          setTimeout(() => {
-            todos.pop();
-            setTodos(todos);
+          setTimeout(async () => {
+            await invoke("complete_todo", { id: todo.id });
+            invoke("get_recent").then((res) => {
+              if(res){
+                setTodos([res]);
+              }else{
+                setTodos([]);
+              }
+            });
           }, 500);
         }
       }}

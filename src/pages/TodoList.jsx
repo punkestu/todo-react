@@ -1,21 +1,14 @@
-import { useState } from "react";
+import { invoke } from "@tauri-apps/api";
+import { useEffect, useState } from "react";
 import Todo from "../components/Todo";
 
 function TodoList() {
-  const [todos, setTodos] = useState([
-    {
-      id: 1,
-      label:
-        "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptates, ex",
-      state: false,
-    },
-    { id: 2, label: "Voluptates, ex", state: false },
-    { id: 3, label: "dolor sit amet", state: false },
-    { id: 4, label: "ipsum dolor", state: false },
-    { id: 5, label: "consectetur", state: false },
-    { id: 6, label: "adipisicing elit", state: false },
-    { id: 7, label: "sit amet consectetur", state: false },
-  ]);
+  const [todos, setTodos] = useState([]);
+  useEffect(() => {
+    invoke("get_list").then((res) => {
+      setTodos(res);
+    });
+  }, []);
   return (
     <div className="flex flex-col items-center justify-center w-3/4 h-screen p-4">
       <h1 className="font-bold text-2xl text-center mb-2">Todo List</h1>

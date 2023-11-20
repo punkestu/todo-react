@@ -1,14 +1,24 @@
+import { invoke } from "@tauri-apps/api";
 import { useEffect, useState } from "react";
 import RecentTodo from "./RecentTodo";
 
 function RecentTodos({ event, setEvent }) {
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState({});
+  useEffect(() => {
+    invoke("get_recent").then(res=>{
+      if(res){
+        setTodos([res]);
+      }
+    });
+  }, []);
   useEffect(() => {
     if (event === "todo.created") {
-      const id = todos.length > 0 ? todos[todos.length - 1].id + 1 : 1;
-      const foundTodos = [...todos, { id, label: `todo ${id}`, state: false }];
-      setTodos(foundTodos);
-      setEvent("");
+      invoke("get_recent").then(res=>{
+        if(res){
+          setTodos([res]);
+        }
+        setEvent("");
+      });
     }
   }, [event]);
   return (

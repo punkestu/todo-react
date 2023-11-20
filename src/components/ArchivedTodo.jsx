@@ -1,3 +1,5 @@
+import { invoke } from "@tauri-apps/api";
+
 function untickTodo(todos, id) {
   return todos.map((todo) => {
     if (todo.id === id) {
@@ -18,9 +20,11 @@ function ArchivedTodo({ todo, todos, setTodos }) {
       onClick={() => {
         setTodos(untickTodo(todos, todo.id));
         if (!todo.state) {
-          setTimeout(() => {
-            todos = todos.filter((t) => t.id !== todo.id);
-            setTodos(todos);
+          setTimeout(async () => {
+            await invoke("uncomplete_todo", { id: todo.id });
+            invoke("get_archive").then((res) => {
+              setTodos(res);
+            });
           }, 500);
         }
       }}

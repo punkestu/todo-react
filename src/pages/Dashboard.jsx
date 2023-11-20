@@ -1,3 +1,4 @@
+import { invoke } from "@tauri-apps/api";
 import { useState } from "react";
 import RecentTodos from "../components/RecentTodos";
 
@@ -9,8 +10,10 @@ function Dashboard() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          setEvent("todo.created");
-          setLabel("");
+          invoke("create_todo", {label}).then(_=>{
+            setEvent("todo.created");
+            setLabel("");
+          })
         }}
         className="flex flex-col items-center w-full gap-y-2"
       >

@@ -1,3 +1,5 @@
+import { invoke } from "@tauri-apps/api";
+
 function tickTodo(todos, id) {
   return todos.map((todo) => {
     if (todo.id === id) {
@@ -10,13 +12,19 @@ function tickTodo(todos, id) {
 function Todo({ todo, todos, setTodos }) {
   return (
     <button
-      className={`${todo.state ? "line-through animate-fade" : "underline hover:bg-white hover:drop-shadow-md duration-100"} px-1`}
+      className={`${
+        todo.state
+          ? "line-through animate-fade"
+          : "underline hover:bg-white drop-shadow-md duration-200"
+      } px-1`}
       onClick={() => {
         setTodos(tickTodo(todos, todo.id));
         if (todo.state) {
-          setTimeout(() => {
-            todos = todos.filter((t) => t.id !== todo.id);
-            setTodos(todos);
+          setTimeout(async () => {
+            await invoke("complete_todo", { id: todo.id });
+            invoke("get_list").then((res) => {
+              setTodos(res);
+            });
           }, 500);
         }
       }}

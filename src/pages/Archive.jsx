@@ -1,21 +1,14 @@
-import { useState } from "react";
+import { invoke } from "@tauri-apps/api";
+import { useState, useEffect } from "react";
 import ArchivedTodo from "../components/ArchivedTodo";
 
 function ArchiveList() {
-  const [todos, setTodos] = useState([
-    {
-      id: 1,
-      label:
-        "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptates, ex",
-      state: true,
-    },
-    { id: 2, label: "Voluptates, ex", state: true },
-    { id: 3, label: "dolor sit amet", state: true },
-    { id: 4, label: "ipsum dolor", state: true },
-    { id: 5, label: "consectetur", state: true },
-    { id: 6, label: "adipisicing elit", state: true },
-    { id: 7, label: "sit amet consectetur", state: true },
-  ]);
+  const [todos, setTodos] = useState([]);
+  useEffect(() => {
+    invoke("get_archive").then((res) => {
+      setTodos(res);
+    });
+  }, []);
   return (
     <div className="flex flex-col items-center justify-center w-3/4 h-screen p-4">
       <h1 className="font-bold text-2xl text-center mb-2">Archived</h1>
