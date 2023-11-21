@@ -1,7 +1,7 @@
 use sqlx::{migrate::MigrateDatabase, sqlite::SqlitePoolOptions, Pool, Sqlite};
 use tokio::runtime::Runtime;
 
-const DB_URL: &str = "sqlite://data/data.db";
+const DB_URL: &str = "data.db";
 
 pub fn gen_pool(rt: &Runtime) -> Result<Pool<Sqlite>, String> {
     rt.block_on(async {

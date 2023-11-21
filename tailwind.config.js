@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       animation: {
-        fade: 'fadeOut 0.5s ease-in-out',
+        fade: 'fadeOut 0.6s ease-in-out',
       },
       keyframes: {
         fadeOut: {

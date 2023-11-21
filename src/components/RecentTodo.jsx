@@ -18,13 +18,19 @@ function RecentTodo({ todo, todos, setTodos }) {
         if (todo.state) {
           setTimeout(async () => {
             await invoke("complete_todo", { id: todo.id });
-            invoke("get_recent").then((res) => {
-              if(res){
-                setTodos([res]);
-              }else{
-                setTodos([]);
-              }
-            });
+            invoke("get_recent")
+              .then((res) => {
+                if (res) {
+                  setTodos([res]);
+                } else {
+                  setTodos([]);
+                }
+              })
+              .catch((err) => {
+                if(err === "todo not found"){
+                  setTodos([]);
+                }
+              });
           }, 500);
         }
       }}
