@@ -9,14 +9,14 @@ function RecentTodos({ event, setEvent }) {
       if(res){
         setTodos([res]);
       }
+    }).catch(err=>{
+      console.log(err);
     });
   }, []);
   useEffect(() => {
     if (event === "todo.created") {
       invoke("get_recent").then(res=>{
-        if(res){
-          setTodos([res]);
-        }
+        setTodos([res]);
         setEvent("");
       });
     }

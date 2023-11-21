@@ -1,31 +1,45 @@
-use super::{
+use crate::app::{
     model::{
-        self,
         request::{CreateOne, ToggleState},
+        todo,
     },
     repo_impl::mysql_impl::TodoImpl,
     service,
 };
 
+use super::model::error;
+
 #[tauri::command]
 pub fn get_list(
     state: tauri::State<'_, service::Todo<TodoImpl>>,
-) -> Result<Vec<model::todo::Todo>, String> {
-    Ok(state.get_list().unwrap())
+) -> Result<Vec<todo::Todo>, String> {
+    match state.get_list() {
+        Ok(list) => Ok(list),
+        Err(err) => match err {
+            error::Error::TodoNotFound => Err(String::from("todo not found")),
+        },
+    }
 }
 
 #[tauri::command]
 pub fn get_archive(
     state: tauri::State<'_, service::Todo<TodoImpl>>,
-) -> Result<Vec<model::todo::Todo>, String> {
-    Ok(state.get_archive().unwrap())
+) -> Result<Vec<todo::Todo>, String> {
+    match state.get_archive() {
+        Ok(list) => Ok(list),
+        Err(err) => match err {
+            error::Error::TodoNotFound => Err(String::from("todo not found")),
+        },
+    }
 }
 
 #[tauri::command]
-pub fn get_recent(state: tauri::State<'_, service::Todo<TodoImpl>>) -> Option<model::todo::Todo> {
+pub fn get_recent(state: tauri::State<'_, service::Todo<TodoImpl>>) -> Result<todo::Todo, String> {
     match state.get_recent() {
-        Ok(todo) => Some(todo),
-        Err(_) => None,
+        Ok(todo) => Ok(todo),
+        Err(err) => match err {
+            error::Error::TodoNotFound => Err(String::from("todo not found")),
+        },
     }
 }
 
@@ -33,24 +47,37 @@ pub fn get_recent(state: tauri::State<'_, service::Todo<TodoImpl>>) -> Option<mo
 pub fn create_todo(
     state: tauri::State<'_, service::Todo<TodoImpl>>,
     label: String,
-) -> model::todo::Todo {
-    state.create_one(CreateOne { label }).unwrap()
+) -> Result<todo::Todo, String> {
+    match state.create_one(CreateOne { label }) {
+        Ok(created) => Ok(created),
+        Err(err) => match err {
+            error::Error::TodoNotFound => Err(String::from("todo not found")),
+        },
+    }
 }
 
 #[tauri::command]
 pub fn complete_todo(
     id: u32,
     state: tauri::State<'_, service::Todo<TodoImpl>>,
-) -> model::todo::Todo {
-    state.toggle_state(ToggleState { id, state: true }).unwrap()
+) -> Result<todo::Todo, String> {
+    match state.toggle_state(ToggleState { id, state: true }) {
+        Ok(completed) => Ok(completed),
+        Err(err) => match err {
+            error::Error::TodoNotFound => Err(String::from("todo not found")),
+        },
+    }
 }
 
 #[tauri::command]
 pub fn uncomplete_todo(
     id: u32,
     state: tauri::State<'_, service::Todo<TodoImpl>>,
-) -> model::todo::Todo {
-    state
-        .toggle_state(ToggleState { id, state: false })
-        .unwrap()
+) -> Result<todo::Todo, String> {
+    match state.toggle_state(ToggleState { id, state: false }) {
+        Ok(completed) => Ok(completed),
+        Err(err) => match err {
+            error::Error::TodoNotFound => Err(String::from("todo not found")),
+        },
+    }
 }

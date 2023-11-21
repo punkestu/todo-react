@@ -19,7 +19,7 @@ pub fn gen_pool(rt: &Runtime) -> Result<Pool<Sqlite>, String> {
             .connect(DB_URL)
             .await
             .unwrap();
-        sqlx::query("CREATE TABLE IF NOT EXISTS todo (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,label VARCHAR(50) NOT NULL,state BIT DEFAULT 0);").execute(&pool).await.unwrap();
+        sqlx::query("CREATE TABLE IF NOT EXISTS todo (id INTEGER PRIMARY KEY AUTOINCREMENT,label VARCHAR(50) NOT NULL,state BIT NOT NULL DEFAULT 0);").execute(&pool).await.unwrap();
         Ok(pool)
     })
 }

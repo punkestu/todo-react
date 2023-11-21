@@ -1,5 +1,8 @@
 use crate::app::{
-    model::{error::Result, todo},
+    model::{
+        error::{self, Result},
+        todo,
+    },
     repo,
 };
 use sqlx::{Row, SqlitePool};
@@ -70,17 +73,20 @@ impl repo::Todo for TodoImpl {
     }
     fn get_by_id(&self, id: u32) -> Result<todo::Todo> {
         self.rt.block_on(async {
-            let row = sqlx::query("SELECT * FROM todo WHERE id=?")
+            if let Ok(row) = sqlx::query("SELECT * FROM todo WHERE id=?")
                 .bind(id)
                 .fetch_one(&self.pool)
                 .await
-                .unwrap();
-            let todo = todo::Todo {
-                id: Some(row.get::<u32, _>("id")),
-                label: row.get::<String, _>("label"),
-                state: row.get::<bool, _>("state"),
-            };
-            Ok(todo)
+            {
+                let todo = todo::Todo {
+                    id: Some(row.get::<u32, _>("id")),
+                    label: row.get::<String, _>("label"),
+                    state: row.get::<bool, _>("state"),
+                };
+                Ok(todo)
+            } else {
+                Err(error::Error::TodoNotFound)
+            }
         })
     }
     fn save(&self, todo: &mut todo::Todo) -> Result<todo::Todo> {
@@ -96,7 +102,7 @@ impl repo::Todo for TodoImpl {
                 Ok(todo.to_owned())
             }),
             None => self.rt.block_on(async {
-                let result = sqlx::query("INSERT INTO todo (label) VALUES (?)")
+                let result = sqlx::query("INSERT INTO todo (id, label) VALUES (NULL, ?)")
                     .bind(&todo.label)
                     .execute(&self.pool)
                     .await
